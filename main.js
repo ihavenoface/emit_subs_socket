@@ -67,7 +67,7 @@ var NODE = detect_node();
 function runSocket (cb) {
     var command_opts = [
         '-e',
-        'const net=require("net"),http=require("http"),WebSocket=require("ws"),server=http.createServer((e,t)=>{if("GET"===e.method){const r=new URL(e.url,"http://localhost"),s=r.searchParams.get("sub-text");let n=r.searchParams.get("secondary-sub-text");s&&"undefined"!==s?("undefined"===n&&(n=null),wss.clients.forEach(e=>{e.readyState===WebSocket.OPEN&&e.send(JSON.stringify({subText:s,secondarySubText:n}))}),t.end("Message relayed via WebSocket\\n")):t.end("No message provided\\n")}else t.end("Hello World\\n")}),wss=new WebSocket.Server({server:server}),tester=net.createServer();tester.once("error",e=>{"EADDRINUSE"===e.code&&console.log("Port 21659 is already in use")}),tester.once("listening",()=>{tester.close(),console.log("Port 21659 is available"),server.listen(21659,()=>{console.log("Server listening on port 21659")})}),tester.listen(21659);'
+        'const net=require("net"),http=require("http"),WebSocket=require("ws"),server=http.createServer((e,r)=>{if("GET"===e.method){const n=new URL(e.url,"http://localhost"),s=n.searchParams.get("sub-text");let t=n.searchParams.get("secondary-sub-text");s&&"undefined"!==s?("undefined"===t&&(t=null),wss.clients.forEach(e=>{e.readyState===WebSocket.OPEN&&e.send(JSON.stringify({subText:s,secondarySubText:t}))}),r.end("Message relayed via WebSocket\\n")):r.end("No message provided\\n")}else r.end("Hello World\\n")}),wss=new WebSocket.Server({server:server}),ensureServerIsRunning=e=>{const r=net.createServer();r.once("error",r=>{"EADDRINUSE"===r.code&&e&&console.log("Port 21659 is already in use")}),r.once("listening",()=>{r.close(),e&&console.log("Port 21659 is available"),server.listen(21659,()=>{e&&console.log("Server listening on port 21659")})}),r.listen(21659)};ensureServerIsRunning(!0),setInterval(()=>{ensureServerIsRunning(!1)},1e3);'
     ]
     var process = mp.command_native_async({
         name: 'subprocess',
@@ -91,7 +91,7 @@ function onLoadHook () {
         query += '&secondary-sub-text';
         query += encodeURIComponent(mp.get_property("secondary-sid"));
         */
-        http.get('http://localhost:21659/' + query, function (err, res) {
+        http.get('http://localhost:21659/' + query, function (err ) {
             if (err) {
                 mp.msg.error(err);
             }

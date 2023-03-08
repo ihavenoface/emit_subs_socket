@@ -38,21 +38,31 @@ const wss = new WebSocket.Server({ server });
     });
 });
 */
+const ensureServerIsRunning = (startup) => {
+    const tester = net.createServer();
 
-const tester = net.createServer();
-
-tester.once('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        console.log('Port 21659 is already in use');
-    }
-});
-
-tester.once('listening', () => {
-    tester.close();
-    console.log('Port 21659 is available');
-    server.listen(21659, () => {
-        console.log('Server listening on port 21659');
+    tester.once('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            if (startup) {
+                console.log('Port 21659 is already in use');
+            }
+        }
     });
-});
 
-tester.listen(21659)
+    tester.once('listening', () => {
+        tester.close();
+        if (startup) {
+            console.log('Port 21659 is available');
+        }
+        server.listen(21659, () => {
+            if (startup) {
+                console.log('Server listening on port 21659');
+            }
+        });
+    });
+
+    tester.listen(21659)
+}
+
+ensureServerIsRunning(true)
+setInterval(() => { ensureServerIsRunning(false) }, 1000)

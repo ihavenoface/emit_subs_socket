@@ -9,16 +9,16 @@
 
 (() => {
     'use strict';
-    let socket;
+    let socket, debounce, isConnected;
 
     function connect() {
+        if (isConnected || socket) return;
         socket = new WebSocket('ws://localhost:21659');
 
         socket.addEventListener('open', () => {
+            isConnected = true;
             console.log('WebSocket connection established');
         });
-
-        let debounce;
 
         socket.addEventListener('message', (event) => {
             // console.log(`Received message: ${event.data}`);
@@ -31,11 +31,15 @@
         });
 
         socket.addEventListener('error', () => {
+            isConnected = false;
+            socket = false;
             console.log('WebSocket connection error');
             setTimeout(connect, 1000); // attempt to reconnect after a delay
         });
 
         socket.addEventListener('close', () => {
+            isConnected = false;
+            socket = false;
             console.log('WebSocket connection closed');
             setTimeout(connect, 1000); // attempt to reconnect after a delay
         });
