@@ -1,0 +1,3 @@
+[submodule "mpv-javascript-http"]
+	path = mpv-javascript-http
+	url = https://github.com/Hill-98/mpv-javascript-http.git
