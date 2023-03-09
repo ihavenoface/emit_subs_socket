@@ -64,33 +64,29 @@ var detect_node = function detect_node() {
 
 var NODE = detect_node();
 
-function runSocket (cb) {
+function runSocket () {
     var command_opts = [
         '-e',
-        'const net=require("net"),http=require("http"),WebSocket=require("ws"),server=http.createServer((e,r)=>{if("GET"===e.method){const n=new URL(e.url,"http://localhost"),s=n.searchParams.get("sub-text");let t=n.searchParams.get("secondary-sub-text");s&&"undefined"!==s?("undefined"===t&&(t=null),wss.clients.forEach(e=>{e.readyState===WebSocket.OPEN&&e.send(JSON.stringify({subText:s,secondarySubText:t}))}),r.end("Message relayed via WebSocket\\n")):r.end("No message provided\\n")}else r.end("Hello World\\n")}),wss=new WebSocket.Server({server:server}),ensureServerIsRunning=e=>{const r=net.createServer();r.once("error",r=>{"EADDRINUSE"===r.code&&e&&console.log("Port 21659 is already in use")}),r.once("listening",()=>{r.close(),e&&console.log("Port 21659 is available"),server.listen(21659,()=>{e&&console.log("Server listening on port 21659")})}),r.listen(21659)};ensureServerIsRunning(!0),setInterval(()=>{ensureServerIsRunning(!1)},1e3);'
+        'const net=require("net"),http=require("http"),WebSocket=require("ws"),server=http.createServer((e,r)=>{if("GET"===e.method){const s=new URL(e.url,"http://localhost"),n=s.searchParams.get("sub-text"),t=s.searchParams.get("time");let o=s.searchParams.get("secondary-sub-text");n&&"undefined"!==n?("undefined"===o&&(o=null),wss.clients.forEach(e=>{e.readyState===WebSocket.OPEN&&e.send(JSON.stringify({subText:n,secondarySubText:o,timePos:t}))}),r.end("Message relayed via WebSocket\\n")):r.end("No message provided\\n")}else r.end("Hello World\\n")}),wss=new WebSocket.Server({server:server}),ensureServerIsRunning=e=>{const r=net.createServer();r.once("error",r=>{"EADDRINUSE"===r.code&&e&&console.log("Port 21659 is already in use")}),r.once("listening",()=>{r.close(),e&&console.log("Port 21659 is available"),server.listen(21659,()=>{e&&console.log("Server listening on port 21659")})}),r.listen(21659)};ensureServerIsRunning(!0),setInterval(()=>{ensureServerIsRunning(!1)},1e3);'
     ]
     var process = mp.command_native_async({
         name: 'subprocess',
-        args: [NODE].concat(command_opts)
-    }, cb);
+        args: [NODE].concat(command_opts),
+    });
     return {
         abort: mp.abort_async_command.bind(this, process),
     }
 }
 
 function onLoadHook () {
-    runSocket(function (res) {
-        if (res !== true) {
-            mp.msg.log('info', res)
-        }
-    })
+    runSocket()
     mp.observe_property("sub-text", "string", function () {
         var query = '?sub-text=';
         query += encodeURIComponent(mp.get_property("sub-text"));
-        /* doesn't actually work, maybe in the future
-        query += '&secondary-sub-text';
-        query += encodeURIComponent(mp.get_property("secondary-sid"));
-        */
+        query += '&secondary-sub-text=';
+        query += encodeURIComponent(mp.get_property("secondary-sub-text"));
+        query += '&time='
+        query += encodeURIComponent(mp.get_property_native("time-pos"));
         http.get('http://localhost:21659/' + query, function (err ) {
             if (err) {
                 mp.msg.error(err);

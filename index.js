@@ -6,12 +6,13 @@ const server = http.createServer((req, res) => {
     if (req.method === 'GET') {
         const url = new URL(req.url, 'http://localhost');
         const subText = url.searchParams.get('sub-text');//.trim();
+        const timePos = url.searchParams.get('time');
         let secondarySubText = url.searchParams.get('secondary-sub-text');//.trim()
         if (subText && subText !== "undefined") {
             if (secondarySubText === "undefined") secondarySubText = null;
             wss.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify({subText, secondarySubText}));
+                    client.send(JSON.stringify({subText, secondarySubText, timePos}));
                 }
             });
             res.end('Message relayed via WebSocket\n');
@@ -38,6 +39,7 @@ const wss = new WebSocket.Server({ server });
     });
 });
 */
+
 const ensureServerIsRunning = (startup) => {
     const tester = net.createServer();
 
