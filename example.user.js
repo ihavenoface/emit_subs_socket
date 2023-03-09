@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Insert from websocket
 // @namespace   Violentmonkey Scripts
-// @match       https://learnjapanese.moe/texthooker.html
+// @match       http*://*.*/texthooker.html
 // @grant       none
 // @version     1.0
 // @author      noface
